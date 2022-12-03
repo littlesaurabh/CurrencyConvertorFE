@@ -48,11 +48,13 @@ export default function CurrencyCard() {
         }
        else{
         axios.get(`${url}/getRate/${to}/${from}`).then(res=>{
+            let response=res.data
+            response=response[response.length-1]
             if(res.data.length)
            {
-            console.log(res.data[0])
-            Calculate(res.data[0].exchangeRate)
-            setDate(res.data[0].date)
+            console.log(response)
+            Calculate(response.exchangeRate)
+            setDate(response.date)
            }else{
             setError("Conversion not available")
            }
@@ -126,7 +128,7 @@ export default function CurrencyCard() {
                 <button class="btn btn-success btn-lg  w-25" onClick={Convert} >Convert</button>
                 <div class="text-center text-danger" >
                     <span id="error">{error&&error}</span>
-                    <span id="error2">{date!= date?`Rates are from date ${date}`:''}</span>
+                    <span id="error2">{date!= moment(new Date()).format('DD/MM/YYYY')?`Rates are from date ${date}`:''}</span>
                 </div>
 
             </div>
