@@ -4,7 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import CurrencyCard from './Components/CurrencyCard';
 import Navbar from './Components/Navbar';
 
+
 function App() {
+
   return (
     <div className="App">
        <Navbar/>
