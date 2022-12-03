@@ -3,6 +3,8 @@ import axios from 'axios'
 import { url } from '../backendURL'
 import { useEffect, useState } from 'react'
 import { currency_list } from './curr'
+import moment from 'moment';
+
 export default function CurrencyCard() {
 
     const [currency, setCurrency] = useState([])
@@ -12,10 +14,11 @@ export default function CurrencyCard() {
     const [toSymbol, setToSymbol] = useState('')
     const [amount, setAmount] = useState('')
     const [error, setError] = useState('')
+    const [date, setDate] = useState(moment(new Date()).format('DD/MM/YYYY'))
     const [convertedAmount, setConvertedAmount] = useState('')
     const [currencylist,setCurrencyList]=useState(currency_list)
     useEffect(() => {
-        axios.get(`${url}/getRateAllToday`).then(res => {
+        axios.get(`${url}/getRateAll`).then(res => {
             
            PopulateUniqueValue(res.data)
         }).catch(err => {
@@ -34,8 +37,10 @@ export default function CurrencyCard() {
     }
    
     const Convert=()=>{
-        let c=currencylist.find(c=> c.symbol==to)
-       console.log( c)
+        console.log( date, moment(new Date()).format('DD/MM/YYYY'))
+        setFromSymbol(currencylist.find(c=> c.code==to))
+        setToSymbol(currencylist.find(c=> c.code==from))
+       console.log(fromSymbol,toSymbol)
         setError('')
         console.log(from,to,amount)
         if(from==to){
@@ -43,8 +48,14 @@ export default function CurrencyCard() {
         }
        else{
         axios.get(`${url}/getRate/${to}/${from}`).then(res=>{
+            if(res.data.length)
+           {
             console.log(res.data[0])
             Calculate(res.data[0].exchangeRate)
+            setDate(res.data[0].date)
+           }else{
+            setError("Conversion not available")
+           }
         }).catch(err=>{
                 console.log(err)
         })
@@ -103,8 +114,8 @@ export default function CurrencyCard() {
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="center" id="to">{amount}</td>
-                        <td class="center" id="from">{convertedAmount}</td>
+                        <td class="center" id="to">{fromSymbol.symbol}{amount}</td>
+                        <td class="center" id="from">{toSymbol.symbol}{convertedAmount}</td>
                     </tr>
                 </tbody>
             </table>
@@ -115,6 +126,7 @@ export default function CurrencyCard() {
                 <button class="btn btn-success btn-lg  w-25" onClick={Convert} >Convert</button>
                 <div class="text-center text-danger" >
                     <span id="error">{error&&error}</span>
+                    <span id="error2">{date!= date?`Rates are from date ${date}`:''}</span>
                 </div>
 
             </div>
