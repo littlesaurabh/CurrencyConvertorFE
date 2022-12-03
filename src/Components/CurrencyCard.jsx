@@ -2,16 +2,18 @@
 import axios from 'axios'
 import { url } from '../backendURL'
 import { useEffect, useState } from 'react'
-
+import { currency_list } from './curr'
 export default function CurrencyCard() {
 
     const [currency, setCurrency] = useState([])
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
+    const [fromSymbol, setFromSymbol] = useState('')
+    const [toSymbol, setToSymbol] = useState('')
     const [amount, setAmount] = useState('')
     const [error, setError] = useState('')
     const [convertedAmount, setConvertedAmount] = useState('')
-
+    const [currencylist,setCurrencyList]=useState(currency_list)
     useEffect(() => {
         axios.get(`${url}/getRateAllToday`).then(res => {
             
@@ -32,17 +34,21 @@ export default function CurrencyCard() {
     }
    
     const Convert=()=>{
+        let c=currencylist.find(c=> c.symbol==to)
+       console.log( c)
         setError('')
         console.log(from,to,amount)
         if(from==to){
             setError("Invalid Conversion! Currency Can't be same.")
         }
+       else{
         axios.get(`${url}/getRate/${to}/${from}`).then(res=>{
             console.log(res.data[0])
             Calculate(res.data[0].exchangeRate)
         }).catch(err=>{
                 console.log(err)
         })
+       }
     }
 
     const Calculate=(exchangeRate)=>{
@@ -87,6 +93,7 @@ export default function CurrencyCard() {
                     <tr>
                         <th style={{ width: 200 }}>
                           {to} 
+                      
                         </th>
                         
                         <th style={{ width: 200 }}>
@@ -96,8 +103,8 @@ export default function CurrencyCard() {
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="center" id="INR">{amount}</td>
-                        <td class="center" id="USD">{convertedAmount}</td>
+                        <td class="center" id="to">{amount}</td>
+                        <td class="center" id="from">{convertedAmount}</td>
                     </tr>
                 </tbody>
             </table>
